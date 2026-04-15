@@ -1,5 +1,5 @@
 const express = require('express')
-const mongoose = requiure('mongoose')
+const mongoose = require('mongoose')
 const connectDB = require('./db')
 const router = express.Router()
 const app = express()
@@ -34,9 +34,25 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true} )
 
 
-const shorten = (req, res) => {
-    
-    
+const shorten = async (req, res) =>{
+    try {
+         const { longUrl} = req.body
+         const shortCode = Math.random().toString(36).substring(2, 8)
+                  
+         const newUrl = await Url.create({
+            longUrl,
+            shortCode
+
+         })
+
+        
+
+        return res.status(200).json(newUrl)
+    } catch (error) {
+        console.log("Error Generating shortUrl code", error)
+        res.status(500).json({ message: "unable to generate shortUrl"})
+
+    }
 }
 
 
