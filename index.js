@@ -67,6 +67,7 @@ const shorten = async (req, res) =>{
          if(!url) return res.status(404).json({ message: "URL not found"})
 
             url.clicks += 1
+            console.log(`Url clicked ${url.clicks} time(s)`)
             await url.save()
 
             return res.redirect(url.longUrl)
