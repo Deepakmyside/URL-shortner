@@ -28,11 +28,12 @@ const userSchema = new mongoose.Schema({
     clicks : {
         type: Number,
         default: 0,
-        trim: true
+        
 
     }
 }, { timestamps: true} )
 
+const Url = mongoose.model("Url", userSchema)
 
 const shorten = async (req, res) =>{
     try {
@@ -47,21 +48,40 @@ const shorten = async (req, res) =>{
 
         
 
-        return res.status(200).json(newUrl)
+        return res.status(201).json({
+            shortUrl: `https/${newUrl.shortCode}`
+        })
     } catch (error) {
         console.log("Error Generating shortUrl code", error)
         res.status(500).json({ message: "unable to generate shortUrl"})
 
     }
+        
 }
 
+  app.get("/:shortCode", async (req, res) =>  {
+    try{
+        const {shortCode} = req.params
+        const url = await Url.findOne( { shortCode})
 
+         if(!url) return res.status(404).json({ message: "URL not found"})
+
+            url.clicks += 1
+            await url.save()
+
+            return res.redirect(url.longUrl)
+    } catch (error){ 
+        res.status(500).json({ message: "Server error "})
+
+    }
+  }
+ )
  router.post("/shorten", shorten)
 
  app.use("/api", router)
 
  connectDB()
-
+     
  app.get("/", (req,res) => {
     res.send("Server khaint running te a baiji")
  })
